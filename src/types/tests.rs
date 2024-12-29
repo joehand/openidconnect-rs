@@ -3,6 +3,14 @@ use crate::IssuerUrl;
 #[test]
 fn test_issuer_url_append() {
     assert_eq!(
+        "https://id.0jjj.casa/.well-known/openid-configuration",
+        IssuerUrl::new("https://id.0jjj.casa/".to_string())
+            .unwrap()
+            .join(".well-known/openid-configuration")
+            .unwrap()
+            .to_string()
+    );
+    assert_eq!(
         "http://example.com/.well-known/openid-configuration",
         IssuerUrl::new("http://example.com".to_string())
             .unwrap()
@@ -53,6 +61,26 @@ fn test_url_serialize() {
     assert_eq!(
         serde_json::to_string(&IssuerUrl::new("http://example.com".to_string()).unwrap()).unwrap(),
         "\"http://example.com\"",
+    );
+}
+
+#[test]
+fn test_url_serialize_0jjj() {
+    let issuer_url =
+        IssuerUrl::new("http://id.0jjj.casa/.well-known/openid-configuration".to_string()).unwrap();
+    let serialized_url = serde_json::to_string(&issuer_url).unwrap();
+
+    assert_eq!(
+        "\"http://id.0jjj.casa/.well-known/openid-configuration\"",
+        serialized_url
+    );
+
+    let deserialized_url = serde_json::from_str(&serialized_url).unwrap();
+    assert_eq!(issuer_url, deserialized_url);
+
+    assert_eq!(
+        serde_json::to_string(&IssuerUrl::new("http://id.0jjj.casa".to_string()).unwrap()).unwrap(),
+        "\"http://id.0jjj.casa\"",
     );
 }
 
